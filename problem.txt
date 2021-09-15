@@ -1,0 +1,75 @@
+Introduction
+Purpose of this document is to give the technical details of the Application Log Monitoring Agent built using POJO.
+
+Requirement for the tool
+Monitor the log files of applications deployed on the cloud for specific error patterns and notify the support teams to take necessary steps for quick remediation.
+
+Rationale for the tool
+Engineers don’t have control over the application to send proper notifications from the application itself. Hence need for an external agent for log monitoring arises.
+Since the standard services like ELK stack in AWS or SNS is yet to be generalized for application specific purposes, a necessity for developing this tool arises.
+
+Use Cases
+Following are the use-cases this tool tries to meet.
+	Configure application specific error patterns to look for
+	Configure time interval to send notifications
+	Configure specific log files to watch for
+	Run log watcher for each log file
+	Observe the occurrence of the error patterns configured 
+	Collect the error data
+	Send the collected data to support teams
+
+Functionalities
+Following are the available functionalities with the agent.
+	Runs Log Watcher for specific log files – which is configurable at the start
+	Collects error logs
+	Saves the error log data in specific files mentioned in the configuration at specified intervals of time
+	Sends email to support teams <<TBD>>
+
+ 
+ 
+
+How to run the application?
+Unzip logwatcher-agent.zip to local folder logwatcher-agent
+cd logwatcher-agent
+Run the following command
+java -jar logwatcher-1.0.jar
+You can also give optional parameters 
+-DpropertyFile=<<absolute-path-of-log-files>> -DappConfig=<<absolute-path-of-app-config>>
+Also, a shell script is supplied which can be run (ensure to have execution rights for this script)
+./start-logwatcher.sh
+Application configuration properties files are kept under conf/ folder.
+Where the conf/app-config.properties shall have the following values,
+#######################################################################
+################## LOG WATCHER APP CONFIG #############################
+#######################################################################
+
+### THE TEMP DIRECTORY LOCATION WHERE TO SAVE THE FILES
+temp-dir-location=tmp/<yourdir>
+
+### INITIAL DELAY AND PROCESS INTERVAL IN WHICH THE DATA COLLECTION & MAIL TRIGGER HAPPENS (in seconds)
+initial-delay=20
+process-interval=20
+
+### ERROR PATTERN STRING TO LOOK AT. KEEP COMMA SEPARATED VALUES (WITHOUT SPACE); KEEP ALL AS UPPER CASE LETTERS
+error-pattern=ERROR,WARN,CRITICAL,SEVERE,MAJOR,ISSUE
+
+### MAIL CONFIGURATION
+mail.smtp.auth=false
+mail.smtp.starttls.enable=false
+mail.smtp.host=
+mail.smtp.port=25
+mail.smtpp.ssl.trust=
+mail.debug=true
+
+mail.from.address=<<authorized SMTP user>>
+### MAIL RECIPIENT LIST. KEEP COMMA SEPARATED VALUES (WITHOUT SPACE)
+mail.to.address=<<comma separated recipients>>
+And log-files.properties shall have the following values.
+#######################################################################
+################## LOG FILES PROPERTIES ###############################
+###########   USE FILE_NAME = FILE_PATH PATTERN      ##################
+#######################################################################
+oss_app_server.log=C:/Users/Documents/APP/APP_server.log
+oss_dub_server.log=C:/Users/Documents/APP/DUB_server.log
+PS: for the above files, give operating system specific file path and it will always have a forward slash (/) as file separator.
+Note: Ensure that the log files location is accessible by non-root users also.
